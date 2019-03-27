@@ -1,0 +1,12 @@
+{
+    "esversion": 6,
+    "strict":"implied",
+    "browser":true,
+    "devel":true,
+    "globals":{
+        "createjs":false,
+        "manifest":true,
+        "Mover":false,
+        "AssetManager":false
+    }
+}
