@@ -1,60 +1,38 @@
 class IntroScreen {
    
-   constructor(stage, assetManager) {
-      console.log(assetManager);
+   constructor(assetManager, stage) {
+      // let eventScreenComplete = new createjs.Event("introFinished");
+      this._screen = new createjs.Container();
+      this._gameStarted = false;
+
       this._stage = stage;
-      // this._maxSpeed = maxSpeed;
-      this._sprite = assetManager.getSprite("spritesheet");
-      this._sprite.gotoAndStop("title");
-      this._sprite.x = 320;
-      this._sprite.y = 150;
-      this._stage.addChild(this._sprite);
+      this._title = assetManager.getSprite("spritesheet");
+      this._title.gotoAndStop("title");
+      this._title.x = 320;
+      this._title.y = 150;
+      this._screen.addChild(this._title);
 
       this._play = assetManager.getSprite("spritesheet");
-      this._play.gotoAndStop("play");
+      this._play.gotoAndStop("playBtn");
       this._play.x = 330;
       this._play.y = 300;
-      this._stage.addChild(this._play);
-
+      this._screen.addChild(this._play);
    }
 
-   onPlay(e){
-      console.log("play");
-
-      // stage.dispatchEvent(eventScreenComplete);
-      stage.removeChild(playBtn);
-      stage.removeChild(title);
-      // stage.addChild(stickMan);
-
+   getGameStarted(){
+      return this._gameStarted;
    }
-   
-   // showMe(){
-   //    console.log("sdf")
-   
 
-   // let title = this._sprite;
-   // title.x = 320;
-   // title.y = 150;
-   // title.gotoAndPlay("title");
-   // this._stage.addChild(title);
+   getPlayBtn(){
+      return this._play;
+   }
 
-   // let playBtn = this._sprite;
-   // playBtn.x = 330;
-   // playBtn.y = 300;
-   // playBtn.gotoAndPlay("play");
-   // this._screen.addChild(playBtn);
+   hideMe(){
+      this._stage.removeChild(this._screen);
+      this._gameStarted = true;
+   }
 
-   // // playBtn.on("click", onPlay());
-   // }
-   // hideMe(){
-   //    console.log("intro hide me");
-   //    stage.removeChild(screen);
-   // }
-
-   // // showMe(){
-   // //    this._stage.addChild(title);
-   // //    this._stage.addChild(playBtn);
-   // // }
-
-   
+   showMe(){
+      this._stage.addChild(this._screen);
+   }
 }

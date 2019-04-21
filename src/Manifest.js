@@ -12,5 +12,15 @@ let manifest = [
         src:"lib/keyDown.ogg",
         id:"keyDownSound",
         data:4
-    }  
+    },
+    {
+        src:"lib/recording.wav",
+        id:"menuMusic",
+        data:4
+    },
+    {
+        src:"lib/recording2.wav",
+        id:"gameMusic",
+        data:4
+    }
 ];

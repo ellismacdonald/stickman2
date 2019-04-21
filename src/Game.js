@@ -10,6 +10,8 @@
     const FRAME_RATE = 24;
     const STICKMAN_MAX_SPEED = 5;
 
+    let menuMusic;
+    let gameMusic;
     // game objects
     let assetManager = null;
     let stickMan = null;
@@ -27,8 +29,8 @@
     let floor = 1052;
     let left = 1;
     let right = 2;
+    let gameStarted = false;
     // ------------------------------------------------------------ private methods
-    
 
     // ------------------------------------------------------------ event handlers
     function onKeyDown(e) {
@@ -50,43 +52,48 @@
     function onReady(e) {
         console.log(">> adding sprites to game");
         e.remove();
+        
+        introScreen = new IntroScreen(assetManager, stage);
+        createjs.Sound.loop("gameMusic");
 
-        // playBtn = assetManager.getSprite("spritesheet");
-        // playBtn.x = 330;
-        // playBtn.y = 300;
-        // playBtn.gotoAndPlay("playBtn");
-        // stage.addChild(playBtn);
+        // contentScreen = new ContentScreen(assetManager, stage);
+        introScreen.showMe();
+        playBtn = introScreen.getPlayBtn();
+        console.log(playBtn);
+        playBtn.on("click", onPlay)
+        // stage.update();
+        // let platformTwo = new createjs.Shape();
+        // platformTwo.graphics.beginFill("black").drawRect(300,700,100,20);
+        createjs.Ticker.framerate = FRAME_RATE;
+        createjs.Ticker.on("tick", onTick);
 
-        // title = assetManager.getSprite("spritesheet");
-        // title.x = 320;
-        // title.y = 150;
-        // title.gotoAndPlay("title");
-        // stage.addChild(title);
-
-        platforms = new Platform();
-        platforms.drawPlatforms(4, stage);
-        platforms.winningPlatform(stage);
-        winPosition = platforms.getWinPosition();
-        winPositionSize = platforms.getWinPositionSize();
-        console.log("winPosition: ", winPosition);
-        // platforms.draw(platformTwo, stage, 100, 400, 100, 20);
-        // platforms.draw(platformThree, stage, 100, 500, 100, 20);
-        // platforms.draw(platformFour, stage, 100, 600, 100, 20);
+        // stage.addChild(platformTwo);
 
         
 
-        // let platformTwo = new createjs.Shape();
-        // platformTwo.graphics.beginFill("black").drawRect(300,700,100,20);
+        console.log(">> game ready");
+    }
 
-        stage.addChild(platformTwo);
+    function onPlay(e){
+        introScreen.hideMe();
+        // stage.removeChild(title);
+        stickMan = new StickMan(stage, assetManager);
 
-        stickMan = new StickMan(stage, assetManager, STICKMAN_MAX_SPEED, 320, 150, floor);
+        // introScreen = new IntroScreen(stage, assetManager, stickMan);
+
         stickMan.resetMe();
 
-        friend = new Friend(stage, assetManager)
-        friend.resetMe(winPosition, winPositionSize)
+        platforms = new Platform(stickMan, stage);
+        platforms.drawPlatforms(4, stage);
+        platforms.winningPlatform(stage);
+        platforms.startingPlatform(stage);
+        winPosition = platforms.getWinPosition();
+        winPositionSize = platforms.getWinPositionSize();
+        console.log("winPosition: ", winPosition);
+
+        friend = new Friend(stage, assetManager);
+        friend.resetMe(winPosition, winPositionSize);
         // construct game object sprites
-        // playBtn.on("click", onPlay);
         // stage.on("mouseClick", mouseClick);
         // setup event listeners for keyboard keys
         document.onkeydown = onKeyDown;
@@ -95,33 +102,29 @@
         document.onmouseup = mouseUp;
 
         // startup the ticker
-        createjs.Ticker.framerate = FRAME_RATE;
-        createjs.Ticker.on("tick", onTick);
-
-        console.log(">> game ready");
-    }
-
-    function onPlay(e){
-        stage.removeChild(playBtn);
-        stage.removeChild(title);
-
+        
     }
 
     function mouseDown(e){
-        
-        isSwinging = true;
-        if(e.button == 0){
-            stickMan.swing(isSwinging, SwingState.LEFT);
-        }else{
-            stickMan.swing(isSwinging, SwingState.RIGHT);
+        if(!stickMan.getDead()){
+            isSwinging = true;
+            if(e.button == 0){
+                stickMan.swing(isSwinging, SwingState.LEFT);
+            }else{
+                stickMan.swing(isSwinging, SwingState.RIGHT);
+            }
         }
+        
     }
 
     function mouseUp(e){
-        isSwinging = false;
-        falling = true;
-        // stickMan.falling();
-        stickMan.swing(isSwinging, SwingState.FALLING);
+        if(!stickMan.getDead()){
+            isSwinging = false;
+            falling = true;
+            // stickMan.falling();
+            stickMan.swing(isSwinging, SwingState.FALLING);
+        }
+        
     }
 
     function monitorKeys(assetManager) {
@@ -143,11 +146,13 @@
     function onTick(e) {
         // TESTING FPS
         document.getElementById("fps").innerHTML = createjs.Ticker.getMeasuredFPS();
-
-        // game loop code here
-        monitorKeys(assetManager);
-        // stickMan.applyPhysics();
-        stickMan.updateMe();
+        if (introScreen.getGameStarted()){
+            platforms.collision();
+            // // game loop code here
+            monitorKeys(assetManager);
+            // // stickMan.applyPhysics();
+            stickMan.updateMe();
+        }
         // update the stage!
         stage.update();
     }
@@ -178,6 +183,7 @@
         assetManager.loadAssets(manifest);
         // displayObject.addEventListener("click", handleClick);
         document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('mouseClick', event => event.preventDefault());
     }
 
     main();
