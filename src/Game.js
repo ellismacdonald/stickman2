@@ -54,7 +54,7 @@
         e.remove();
         
         introScreen = new IntroScreen(assetManager, stage);
-        createjs.Sound.loop("gameMusic");
+        createjs.Sound.play("gameMusic");
 
         // contentScreen = new ContentScreen(assetManager, stage);
         introScreen.showMe();

@@ -50,11 +50,18 @@ class StickMan {
 
    updateMe() {
       if(this._sprite.y + this._sprite.getBounds().height == 800){
+         console.log('first if');
          this._sprite.gotoAndPlay("death");
          this._sprite.y = this._stage.canvas.height - this._sprite.getBounds().height;
          this._falling = false;
          this._dead = true;
          this._stage.update();
+      }
+      // console.log(this._sprite.currentAnimationFrame)
+      if (this._sprite.currentAnimationFrame == 27 && this._sprite.currentAnimation == "death"){
+         console.log("game over");
+         this._sprite.stop();
+
       }
 
       if(this._falling){

@@ -40,10 +40,10 @@ class Platform{
       this._feet = this._sprite.y + this._sprite.getBounds().height
       this._spd = this._startingPlatformDimensions;
       
-      console.log(this._startingPlatform);
-      console.log(this._startingPlatformDimensions);
-      console.log(this._sprite.y);
-      console.log(this._sprite.x);
+      // console.log(this._startingPlatform);
+      // console.log(this._startingPlatformDimensions);
+      // console.log(this._sprite.y);
+      // console.log(this._sprite.x);
 
       if (this._startPlatformExists && this._feet >= this._spd.y && this._sprite.x >= this._spd.x && this._sprite.x < (this._spd.x + 65)){
          this._stickMan.setFalling(false);
@@ -84,7 +84,7 @@ class Platform{
             xw: this._xwidth,
             yh: this._yheight
          }
-         console.log(this._platformObj);
+         // console.log(this._platformObj);
          this._platformList.push(this._platformObj);
       }
    }
