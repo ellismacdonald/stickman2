@@ -4,6 +4,7 @@
     let stage = null;
     let canvas = null;
     let introScreen = null;
+    let gameOver = null;
     let circle = null;
     let ctx = null;
     // frame rate of game
@@ -26,6 +27,9 @@
     let keyRight = false;
     let jumping = false;
     let isSwinging = false;
+
+    let stickManCheck = null;
+
     let floor = 1052;
     let left = 1;
     let right = 2;
@@ -48,6 +52,11 @@
         stickMan.stopMe();
     }
 
+    function playAgain(){
+        stickMan.setDead(false);
+        introScreen.showMe();
+    }
+
 
     function onReady(e) {
         console.log(">> adding sprites to game");
@@ -55,11 +64,11 @@
         
         introScreen = new IntroScreen(assetManager, stage);
         createjs.Sound.play("gameMusic");
-
+        // gameOver = new GameOver(stage);
         // contentScreen = new ContentScreen(assetManager, stage);
         introScreen.showMe();
         playBtn = introScreen.getPlayBtn();
-        console.log(playBtn);
+        // console.log(playBtn);
         playBtn.on("click", onPlay)
         // stage.update();
         // let platformTwo = new createjs.Shape();
@@ -78,7 +87,7 @@
         introScreen.hideMe();
         // stage.removeChild(title);
         stickMan = new StickMan(stage, assetManager);
-
+        stickManCheck = stickMan.getSprite();
         // introScreen = new IntroScreen(stage, assetManager, stickMan);
 
         stickMan.resetMe();
@@ -89,15 +98,15 @@
         platforms.startingPlatform(stage);
         winPosition = platforms.getWinPosition();
         winPositionSize = platforms.getWinPositionSize();
-        console.log("winPosition: ", winPosition);
+        // console.log("winPosition: ", winPosition);
 
-        friend = new Friend(stage, assetManager);
+        friend = new Friend(stage, assetManager, stickMan);
         friend.resetMe(winPosition, winPositionSize);
         // construct game object sprites
         // stage.on("mouseClick", mouseClick);
         // setup event listeners for keyboard keys
-        document.onkeydown = onKeyDown;
-        document.onkeyup = onKeyUp;
+        // document.onkeydown = onKeyDown;
+        // document.onkeyup = onKeyUp;
         document.onmousedown = mouseDown;
         document.onmouseup = mouseUp;
 
@@ -107,6 +116,7 @@
 
     function mouseDown(e){
         if(!stickMan.getDead()){
+            // console.log('mousing')
             isSwinging = true;
             if(e.button == 0){
                 stickMan.swing(isSwinging, SwingState.LEFT);
@@ -115,6 +125,12 @@
             }
         }
         
+    }
+
+    function remove(){
+        stickMan.remove();
+        platforms.remove();
+        friend.remove();
     }
 
     function mouseUp(e){
@@ -148,11 +164,26 @@
         document.getElementById("fps").innerHTML = createjs.Ticker.getMeasuredFPS();
         if (introScreen.getGameStarted()){
             platforms.collision();
+            friend.update();
             // // game loop code here
             monitorKeys(assetManager);
             // // stickMan.applyPhysics();
+            if(stickMan.getGameOver()){
+                // console.log('gameover')
+                stickMan.setDead(false);
+                stickMan.setGameOver(false);
+                gameOver = new GameOver(stage);
+                remove();
+                gameOver.showMe();
+                setTimeout(function(){gameOver.hideMe()}, 2000)
+                setTimeout(function(){playAgain()}, 2000);
+            }
             stickMan.updateMe();
         }
+
+        
+
+        
         // update the stage!
         stage.update();
     }

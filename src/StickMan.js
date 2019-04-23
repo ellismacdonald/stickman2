@@ -14,7 +14,16 @@ class StickMan {
       this._state = 0
       this._stage = stage;
       this._sprite = assetManager.getSprite("spritesheet");
+      this._gameOver = false;
       stage.addChild(this._sprite);
+   }
+
+   remove(){
+      // console.log('remove');
+      this._sprite.gotoAndStop("walkRight");
+
+      this._stage.removeChild(this._sprite);
+
    }
 
    getSprite(){
@@ -29,7 +38,13 @@ class StickMan {
       return this._dead;
    }
 
+   setDead(value){
+      // console.log(value);
+      this._dead = value;
+   }
+
    setFalling(value){
+      // console.log('fuck fuck fuck');
       this._falling = value;
    }
 
@@ -37,10 +52,19 @@ class StickMan {
       this._velocity = value;
    }
 
+   getGameOver(){
+      return this._gameOver;
+   }
+
+   setGameOver(value){
+      this._gameOver = value;
+   }
+
    resetMe() {
       this._sprite.gotoAndStop("walkRight");
       this._sprite.x = 100;
-      this._sprite.y = this._stage.canvas.height - this._sprite.getBounds().height - 200
+      this._sprite.y = 100;
+      // this._sprite.y = this._stage.canvas.height - this._sprite.getBounds().height - 200
    }
 
    stopMe() {
@@ -49,19 +73,23 @@ class StickMan {
    }
 
    updateMe() {
+      // console.log(this._falling);
       if(this._sprite.y + this._sprite.getBounds().height == 800){
-         console.log('first if');
          this._sprite.gotoAndPlay("death");
          this._sprite.y = this._stage.canvas.height - this._sprite.getBounds().height;
          this._falling = false;
-         this._dead = true;
+         
          this._stage.update();
       }
-      // console.log(this._sprite.currentAnimationFrame)
-      if (this._sprite.currentAnimationFrame == 27 && this._sprite.currentAnimation == "death"){
-         console.log("game over");
-         this._sprite.stop();
-
+      
+      if (this._sprite.currentAnimation == "death"){
+         this._dead = true;
+         if(this._sprite.currentAnimationFrame == 27){
+            this._gameOver = true;
+            this._sprite.stop();
+            this.remove();
+         }
+         
       }
 
       if(this._falling){
@@ -80,10 +108,6 @@ class StickMan {
          this._velocity = 0;
          }
       }
-   
-   get speed() {
-      return this._sprite.mover.speed;        
-   } 
 
    swing(isSwinging, direction){
       this._falling = false;
