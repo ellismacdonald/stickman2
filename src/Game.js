@@ -5,6 +5,7 @@
     let canvas = null;
     let introScreen = null;
     let gameOver = null;
+    let gameWon = null;
     let circle = null;
     let ctx = null;
     // frame rate of game
@@ -28,7 +29,7 @@
     let jumping = false;
     let isSwinging = false;
 
-    let stickManCheck = null;
+    // let stickManCheck = null;
 
     let floor = 1052;
     let left = 1;
@@ -37,20 +38,6 @@
     // ------------------------------------------------------------ private methods
 
     // ------------------------------------------------------------ event handlers
-    function onKeyDown(e) {
-        if (e.keyCode == 65) keyLeft = true;
-        else if (e.keyCode == 68) keyRight = true;
-        else if (e.keyCode == 32) keyJump = true; 
-        createjs.Sound.play("keyDownSound");
-    }
-
-    function onKeyUp(e) {
-        if (e.keyCode == 65) keyLeft = false;
-        else if (e.keyCode == 68) keyRight = false;
-        else if (e.keyCode == 32) keyJump = false;
-        createjs.Sound.play("keyUpSound");
-        stickMan.stopMe();
-    }
 
     function playAgain(){
         stickMan.setDead(false);
@@ -61,62 +48,48 @@
     function onReady(e) {
         console.log(">> adding sprites to game");
         e.remove();
-        
         introScreen = new IntroScreen(assetManager, stage);
-        createjs.Sound.play("gameMusic");
-        // gameOver = new GameOver(stage);
-        // contentScreen = new ContentScreen(assetManager, stage);
+        gameOver = new GameOver(stage);
+        gameWon = new GameWon(stage);
+        sounds = new Sounds();
+        // createjs.Sound.play("gameMusic");
+
         introScreen.showMe();
         playBtn = introScreen.getPlayBtn();
-        // console.log(playBtn);
         playBtn.on("click", onPlay)
-        // stage.update();
-        // let platformTwo = new createjs.Shape();
-        // platformTwo.graphics.beginFill("black").drawRect(300,700,100,20);
         createjs.Ticker.framerate = FRAME_RATE;
         createjs.Ticker.on("tick", onTick);
-
-        // stage.addChild(platformTwo);
-
-        
-
         console.log(">> game ready");
     }
 
     function onPlay(e){
+        sounds.getStartRound();
         introScreen.hideMe();
-        // stage.removeChild(title);
-        stickMan = new StickMan(stage, assetManager);
-        stickManCheck = stickMan.getSprite();
-        // introScreen = new IntroScreen(stage, assetManager, stickMan);
+        
+        stickMan = new StickMan(stage, assetManager, sounds);
+        // stickManCheck = stickMan.getSprite();
 
         stickMan.resetMe();
 
-        platforms = new Platform(stickMan, stage);
+        platforms = new Platform(stickMan, stage, sounds);
         platforms.drawPlatforms(4, stage);
         platforms.winningPlatform(stage);
         platforms.startingPlatform(stage);
         winPosition = platforms.getWinPosition();
         winPositionSize = platforms.getWinPositionSize();
-        // console.log("winPosition: ", winPosition);
 
         friend = new Friend(stage, assetManager, stickMan);
         friend.resetMe(winPosition, winPositionSize);
-        // construct game object sprites
-        // stage.on("mouseClick", mouseClick);
-        // setup event listeners for keyboard keys
-        // document.onkeydown = onKeyDown;
-        // document.onkeyup = onKeyUp;
+
         document.onmousedown = mouseDown;
         document.onmouseup = mouseUp;
-
-        // startup the ticker
         
     }
 
     function mouseDown(e){
-        if(!stickMan.getDead()){
-            // console.log('mousing')
+        if(!stickMan.getDead() && introScreen.getGameStarted()){
+            sounds.getGrapple();
+            sounds.getSwoosh();
             isSwinging = true;
             if(e.button == 0){
                 stickMan.swing(isSwinging, SwingState.LEFT);
@@ -127,20 +100,13 @@
         
     }
 
-    function remove(){
-        stickMan.remove();
-        platforms.remove();
-        friend.remove();
-    }
-
     function mouseUp(e){
         if(!stickMan.getDead()){
+            sounds.getGrapple('stop');
+            sounds.getSwoosh('stop');
             isSwinging = false;
-            falling = true;
-            // stickMan.falling();
             stickMan.swing(isSwinging, SwingState.FALLING);
         }
-        
     }
 
     function monitorKeys(assetManager) {
@@ -159,36 +125,42 @@
         }
     }
 
+    function remove(){
+        stickMan.remove();
+        platforms.remove();
+        friend.remove();
+    }
+
     function onTick(e) {
         // TESTING FPS
         document.getElementById("fps").innerHTML = createjs.Ticker.getMeasuredFPS();
         if (introScreen.getGameStarted()){
             platforms.collision();
-            friend.update();
-            // // game loop code here
+            // friend.update();
             monitorKeys(assetManager);
-            // // stickMan.applyPhysics();
+
             if(stickMan.getGameOver()){
-                // console.log('gameover')
                 stickMan.setDead(false);
                 stickMan.setGameOver(false);
-                gameOver = new GameOver(stage);
+                introScreen.setGameStarted(false);
                 remove();
                 gameOver.showMe();
-                setTimeout(function(){gameOver.hideMe()}, 2000)
+                setTimeout(function(){gameOver.hideMe()}, 3000)
+                setTimeout(function(){playAgain()}, 3000);
+            }
+
+            if(platforms.getGameWon()){
+                platforms.setGameWon(false);
+                introScreen.setGameStarted(false);
+                remove();
+                gameWon.showMe();
+                setTimeout(function(){gameWon.hideMe()}, 2000)
                 setTimeout(function(){playAgain()}, 2000);
             }
             stickMan.updateMe();
         }
-
-        
-
-        
-        // update the stage!
         stage.update();
     }
-
-
 
     // ---------------------------------------------------------- main method
     function main() {
@@ -196,16 +168,13 @@
         // get reference to canvas
         canvas = document.getElementById("myCanvas");
         ctx = canvas.getContext('2d');
-        
         // set canvas to as wide/high as the browser window
         canvas.width = 800;
         canvas.height = 800;
         // create stage object
         stage = new createjs.StageGL(canvas);
-        
         stage.setClearColor("#CCCCCC");
         // draw();
-        
 
         // construct preloader object to load spritesheet and sound assets
         assetManager = new AssetManager(stage);
@@ -216,9 +185,7 @@
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('mouseClick', event => event.preventDefault());
     }
-
     main();
-
 })();
 
 let SwingState = {

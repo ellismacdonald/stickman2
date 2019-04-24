@@ -1,5 +1,6 @@
 class Platform{
-   constructor(stickMan, stage){
+   constructor(stickMan, stage, sounds){
+      this._sounds = sounds;
       this._xpos = null;
       this._ypos = null;
       this._xwidth = null;
@@ -25,7 +26,6 @@ class Platform{
       this._platformLocation = [];
       
       this._stickMan = stickMan;
-
       this._gameWon = false;
    }
 
@@ -37,6 +37,14 @@ class Platform{
       return this._winPositionSize;
    }
 
+   getGameWon(){
+      return this._gameWon;
+   }
+
+   setGameWon(value){
+      this._gameWon = value;
+   }
+
    remove(object){
       // this._stage.removeChild(object);
       this._stage.removeChild(this._startingPlatform);
@@ -44,8 +52,11 @@ class Platform{
       this._stage.removeChild(this._platform2);
       this._stage.removeChild(this._platform3);
       this._stage.removeChild(this._winPlatform);
+   }
 
-
+   removeSprite(){
+      this._stickMan._sprite.gotoAndStop("walkRight");
+      this._stage.removeChild(this._stickMan._sprite);
    }
 
    collision(){
@@ -53,81 +64,26 @@ class Platform{
       this._sprite = this._stickMan.getSprite();
 
       this._feet = this._sprite.y + this._sprite.getBounds().height;
-      // this._feetY = this._sprite.y + this._sprite.getBounds().width /;
 
       this._spd = this._startingPlatformDimensions;
-      
-      // console.log(this._startingPlatform);
-      // console.log(this._startingPlatformDimensions);
-      // console.log(this._sprite.y);
-      // console.log(this._sprite.x);
-
-      // console.log('feet: ', this._feet);
-      // console.log('winCheck.x: ', this._winCheck.x);
-      
-      // console.log(this._sprite);
-      // console.log(this._feet);
-
       let platformSize = this._winCheck.x + this._winPositionSize;
-      // console.log(platformSize);
 
-      if (this._startPlatformExists && this._feet >= this._spd.y && this._sprite.x >= this._spd.x && this._sprite.x < (this._spd.x + 50)){
+      if (this._startPlatformExists && this._feet >= this._spd.y && this._sprite.x >= this._spd.x && this._sprite.x < (this._spd.x + 45)){
          this._stickMan.setFalling(false);
       }
-      
-      // if (this._feet <= this._winCheck.y && (this._feet >= (this._winCheck.x) && this._feet <= (this._winCheck.x + this._winPositionSize))){
-      //    this._stickMan.setFalling(false);
-      //    this._gameWon = true;
-      //    console.log('winner');
-      // }
-      // console.log(this._winPlatform);
-      // console.log(this._winPosition);
-      // console.log(this._winPlatform.graphics.command.h);
-      console.log('wincheck.x: ', this._winCheck.x)
-      console.log('wincheck.y: ', this._winCheck.y)
-      console.log('feet: ', this._feet)
-      console.log(this._sprite.x)
 
-      if (this._feet >= this._winCheck.y && this._sprite.x >= this._winCheck.x){
+      if (this._feet <= this._winCheck.y && this._sprite.x >= this._winPosition && this._sprite.x <= (this._winPosition + this._winPositionSize)){
          this._stickMan.setFalling(false);
-         this._gameWon = true;
+         
+         if(this._stickMan._sprite.currentAnimation == 'jump' && this._stickMan._sprite.currentAnimationFrame == 13){
+            this._gameWon = true;
+            this._sounds.getFireworks();
+            this._sounds.getApplause();
+            this._stickMan._sprite.stop();
+            this.removeSprite();
+         }
          console.log('winner');
       }
-
-      var vectorX = (this._sprite.x + (this._sprite.width/2)) - (this._winCheck.x + (this._winCheck.width/2));
-      var vectorY = (this._sprite.y + (this._sprite.height/2)) - this._winCheck.y;
-
-      // var halfWidths = (this._sprite.width/2) + (this._winCheck.width/2);
-      // var halfHeights = (this._sprite.height/2) + (this._winCheck.height/2);
-
-      // var collisionDirection = null;
-
-      // if(Math.abs(vectorX) < halfWidths && Math.abs(vectorY) < halfHeights){
-
-      //    var offsetX = halfWidths - Math.abs(vectorX);
-      //    var offsetY = halfHeights - Math.abs(vectorY);
-      //    if(offsetX < offsetY){
-
-      //       if (vectorX > 0){
-      //          collisionDirection = "left";
-      //          this._sprite.x += offsetX;
-      //       } else {
-      //          collisionDirection = "right";
-      //          this._sprite.x -= offsetX;
-      //       }
-
-      //    } else {
-
-      //       if (vectorY > 0){
-      //          collisionDirection = "top";
-      //          this._sprite.y += offsetY;
-      //       } else {
-      //          collisionDirection = "bottom";
-      //          this._sprite.y -= offsetY;
-      //       }
-
-      //    }
-      // }
    }
 
    startingPlatform(){
@@ -146,7 +102,7 @@ class Platform{
       }
 
    }
-   // x, y , length, height
+
    drawPlatforms(numOfPlatforms, stage){
       this._platform1 = new createjs.Shape();
       this._platform1.graphics.beginFill("DeepSkyBlue").drawRect(100, 250, 100, 20);
@@ -162,12 +118,10 @@ class Platform{
    }
 
    winningPlatform(stage){
-      // this._winPosition = Math.random() * (700 - 100) + 100;
-      // this._winPositionSize = Math.random() * (200 - 50) + 50;
-      this._winPosition = 100;
-      // this._winPositionSize = Math.random() * (200 - 50) + 50;
-      this._winPositionSize = 50;
-      this._ypos = 200;
+      this._winPosition = Math.random() * (700 - 100) + 100;
+      this._winPositionSize = Math.random() * (200 - 50) + 50;
+
+      this._ypos = 150;
 
       this._winPlatform = new createjs.Shape();
       this._winPlatform.graphics.beginFill("red").drawRect(this._winPosition, this._ypos,this._winPositionSize, this._yheight);
@@ -194,3 +148,30 @@ class Platform{
 //    // console.log(this._platformObj);
 //    this._platformLocation.push(this._platformObj);
 // }
+
+        // if (this._feet <= this._winCheck.y && (this._feet >= (this._winCheck.x) && this._feet <= (this._winCheck.x + this._winPositionSize))){
+      //    this._stickMan.setFalling(false);
+      //    this._gameWon = true;
+      //    console.log('winner');
+      // }
+      // console.log(this._winPlatform);
+      // console.log(this._winPosition);
+      // console.log(this._winPlatform.graphics.command.h);
+      // console.log('wincheck.x: ', this._winCheck.x)
+      // console.log('wincheck.y: ', this._winCheck.y)
+      // console.log('feet: ', this._feet)
+      // console.log(this._sprite.x)
+
+      // console.log(this._startingPlatform);
+      // console.log(this._startingPlatformDimensions);
+      // console.log(this._sprite.y);
+      // console.log(this._sprite.x);
+
+      // console.log('feet: ', this._feet);
+      // console.log('winCheck.x: ', this._winCheck.x);
+      
+      // console.log(this._sprite);
+      // console.log(this._feet);
+            // this._winPosition = 100;
+      // this._winPositionSize = Math.random() * (200 - 50) + 50;
+      // this._winPositionSize = 50;

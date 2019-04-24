@@ -23,6 +23,10 @@ class IntroScreen {
       return this._gameStarted;
    }
 
+   setGameStarted(value){
+      this._gameStarted = value;
+   }
+
    getPlayBtn(){
       return this._play;
    }

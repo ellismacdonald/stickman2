@@ -44,8 +44,11 @@ class StickMan {
    }
 
    setFalling(value){
-      // console.log('fuck fuck fuck');
       this._falling = value;
+   }
+
+   getFalling(){
+      return this._falling;
    }
 
    setVelocity(value){
@@ -63,8 +66,7 @@ class StickMan {
    resetMe() {
       this._sprite.gotoAndStop("walkRight");
       this._sprite.x = 100;
-      this._sprite.y = 100;
-      // this._sprite.y = this._stage.canvas.height - this._sprite.getBounds().height - 200
+      this._sprite.y = this._stage.canvas.height - this._sprite.getBounds().height - 200
    }
 
    stopMe() {
@@ -73,7 +75,7 @@ class StickMan {
    }
 
    updateMe() {
-      // console.log(this._falling);
+      
       if(this._sprite.y + this._sprite.getBounds().height == 800){
          this._sprite.gotoAndPlay("death");
          this._sprite.y = this._stage.canvas.height - this._sprite.getBounds().height;
@@ -84,12 +86,15 @@ class StickMan {
       
       if (this._sprite.currentAnimation == "death"){
          this._dead = true;
+         if(this._sprite.currentAnimationFrame == 1){
+            createjs.Sound.play("ouch");
+         }
+
          if(this._sprite.currentAnimationFrame == 27){
             this._gameOver = true;
             this._sprite.stop();
             this.remove();
          }
-         
       }
 
       if(this._falling){
@@ -110,6 +115,7 @@ class StickMan {
       }
 
    swing(isSwinging, direction){
+
       this._falling = false;
       this._isSwinging = isSwinging;
       if (this._velocity < 0) {
