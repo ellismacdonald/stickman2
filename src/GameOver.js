@@ -1,7 +1,6 @@
 class GameOver {
    
    constructor(stage) {
-      // let eventScreenComplete = new createjs.Event("introFinished");
       this._screen = new createjs.Container();
       this._gameOver = null;
       this._stage = stage;
@@ -14,13 +13,9 @@ class GameOver {
       this._title.y = 600;
       this._screen.addChild(this._title);
    }
-   
+
    hideMe(){
-      // console.log('hide me');
-      // console.log(this._stage);
-      // console.log(this._screen);
       this._stage.removeChild(this._screen);
-      // this._gameStarted = true;
    }
 
    showMe(){

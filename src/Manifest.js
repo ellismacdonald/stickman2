@@ -67,5 +67,10 @@ let manifest = [
         src:"lib/yahoo.wav",
         id:"yahoo",
         data:4
+    },
+    {
+        src:"lib/boo.wav",
+        id:"boo",
+        data:4
     }
 ];

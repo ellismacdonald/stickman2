@@ -1,7 +1,6 @@
 class IntroScreen {
    
    constructor(assetManager, stage) {
-      // let eventScreenComplete = new createjs.Event("introFinished");
       this._screen = new createjs.Container();
       this._gameStarted = false;
 

@@ -34,4 +34,12 @@ class Sounds{
    getApplause(){
       this.sound.play('applause');
    }
+
+   getBoo(){
+      this.sound.play('boo');
+   }
+
+   getOuch(){
+      this.sound.play('ouch');
+   }
 }
