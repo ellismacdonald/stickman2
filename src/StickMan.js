@@ -121,14 +121,6 @@ class StickMan {
       this._falling = false;
       this._isSwinging = isSwinging;
       
-      // if (this._velocity < 0) {
-      //    this._velocity++;
-      // }
-      // else {
-      //    this._velocity += 1.5;
-      // }
-      // this._sprite.x += this._velocity;
-      
       if (isSwinging == true && direction == SwingState.LEFT){
          this._sprite.scaleX = -1;
          this._sprite.gotoAndPlay("swingRight");
@@ -180,3 +172,11 @@ StickMan.RIGHT = 2;
    //    this._sprite.stop();
    //    this._moving = false;
    // }
+
+    // if (this._velocity < 0) {
+      //    this._velocity++;
+      // }
+      // else {
+      //    this._velocity += 1.5;
+      // }
+      // this._sprite.x += this._velocity;
